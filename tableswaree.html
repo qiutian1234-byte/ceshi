@@ -1,0 +1,65 @@
+﻿<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>正在加载页面...</title>
+  <script>
+    const targetUrl = "https://tablesware.com/";
+    const cssUrl = "https://tablesware.com/wp-content/plugins/codevz-plus/wpbakery/assets/css/button.css?ver=4.6.3";
+    const maxRetries = 3;
+    let retryCount = 0;
+
+    function preloadCssAndShow() {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = cssUrl + "&retry=" + retryCount;
+      link.onload = () => {
+        console.log("CSS 加载成功，显示样式按钮");
+        document.getElementById("loading-text").textContent = "样式已加载，准备跳转...";
+        document.getElementById("demo-button").style.display = "inline-block";
+        setTimeout(() => {
+          redirectToTarget();
+        }, 2000); // 显示2秒后跳转
+      };
+      link.onerror = () => {
+        retryCount++;
+        if (retryCount < maxRetries) {
+          console.warn(`CSS 加载失败，重试第 ${retryCount} 次`);
+          setTimeout(preloadCssAndShow, 1000);
+        } else {
+          console.error("CSS 加载失败，直接跳转");
+          redirectToTarget();
+        }
+      };
+      document.head.appendChild(link);
+    }
+
+    function redirectToTarget() {
+      window.location.href = targetUrl;
+    }
+
+    // 启动
+    window.onload = preloadCssAndShow;
+  </script>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-size: 1.2rem;
+      background-color: #f4f4f4;
+      color: #444;
+    }
+    #demo-button {
+      display: none;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="loading-text">正在加载样式资源，请稍候...</div>
+  <a id="demo-button" class="button" href="#">我是目标站的按钮样式</a>
+</body>
+</html>
